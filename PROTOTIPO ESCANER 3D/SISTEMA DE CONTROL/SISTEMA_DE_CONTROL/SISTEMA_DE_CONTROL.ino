@@ -256,4 +256,210 @@ void loop() {
     }
 }
 
+//***********************************************Menu1 - Cinematico***********************************************//
+
+  if (MenuNr == 1){  // Si el número del menú es 1, se ejecuta el código del Menú 1.
+    
+    if (SwMenu == 0){  // Si el submenú (SwMenu) es 0, se muestra el texto "Cinematico" en la pantalla LCD.
+      lcd.setCursor(0, 0);  // Configura el cursor en la posición 0,0 de la pantalla LCD.
+      lcd.print("Cinematico");  // Muestra el texto "Cinematico".
+      CinCancelFlag = 0;  // Restablece la bandera de cancelación cinemática a 0.
+      Cntr = 0;  // Restablece el contador a 0.
+    }
+
+    if (SwMenu == 1){  // Si el submenú (SwMenu) es 1, se muestra y ajusta la velocidad del motor.
+      lcd.setCursor(0, 0);  // Configura el cursor en la posición 0,0 de la pantalla LCD.
+      lcd.print("Vel. motor");  // Muestra el texto "Vel. motor".
+      lcd.setCursor(7, 1);  // Configura el cursor en la posición 7,1 (segunda línea).
+      lcd.print(rolePerMinute);  // Muestra la velocidad del motor (rolePerMinute).
+
+      if (FastChng == 0) {  // Si no se está en modo de cambio rápido, actualiza el tiempo de referencia.
+        SetTime = millis();  // Establece SetTime al tiempo actual en milisegundos.
+      }
+      
+      if (YValue < 400 && Flag3 == 0){ // Si el joystick se mueve hacia arriba (YValue < 400) y la bandera 3 es 0, aumenta la velocidad en 1 RPM.
+        rolePerMinute = rolePerMinute + 1;  // Incrementa rolePerMinute en 1.
+        Flag3 = 1;  // Establece Flag3 a 1 para evitar cambios repetitivos.
+        FastChng = 1;  // Activa el modo de cambio rápido.
+        lcd.clear();  // Limpia la pantalla LCD.
+      }
+      
+      if (YValue > 600 && Flag3 == 0){ // Si el joystick se mueve hacia abajo (YValue > 600) y la bandera 3 es 0, disminuye la velocidad en 1 RPM.
+        rolePerMinute = rolePerMinute - 1;  // Decrementa rolePerMinute en 1.
+        Flag3 = 1;  // Establece Flag3 a 1 para evitar cambios repetitivos.
+        FastChng = 1;  // Activa el modo de cambio rápido.
+        lcd.clear();  // Limpia la pantalla LCD.
+      }
+      
+      if (YValue > 399 && YValue < 599 && Flag3 == 1){  // Si el joystick está en la posición neutral (YValue entre 400 y 600) y Flag3 es 1, restablece Flag3 y desactiva el modo de cambio rápido.
+        Flag3 = 0;  // Restablece Flag3.
+        FastChng = 0;  // Desactiva el modo de cambio rápido.
+      }
+
+      if (YValue < 400 && FastChng == 1) {  // Si el joystick está hacia arriba y el modo de cambio rápido está activado, y se mantiene por más tiempo que el tiempo de demora rápido, entra en el modo de cambio rápido.
+        if ((millis() - SetTime) > FastDelay) {  // Si ha pasado más tiempo que FastDelay desde SetTime:
+          FastChng = 2;  // Establece FastChng a 2 para indicar el modo de cambio rápido.
+          SetTime = millis();  // Actualiza SetTime al tiempo actual.
+        }
+      }
+
+      if (YValue > 600 && FastChng == 1) {  // Si el joystick está hacia abajo y el modo de cambio rápido está activado, y se mantiene por más tiempo que el tiempo de demora rápido, entra en el modo de cambio rápido.
+        if ((millis() - SetTime) > FastDelay) {  // Si ha pasado más tiempo que FastDelay desde SetTime:
+          FastChng = 2;  // Establece FastChng a 2 para indicar el modo de cambio rápido.
+          SetTime = millis();  // Actualiza SetTime al tiempo actual.
+        }
+      }
+
+      if (YValue < 400 && FastChng == 2) {  // Si estamos en modo de cambio rápido y el joystick está hacia arriba:
+        if ((millis() - SetTime) > LongInt) {  // Si ha pasado suficiente tiempo basado en LongInt:
+          rolePerMinute = rolePerMinute + 1;  // Incrementa rolePerMinute en 1.
+          SetTime = millis();  // Actualiza SetTime al tiempo actual.
+          lcd.clear();  // Limpia la pantalla LCD.
+        }
+      }
+
+      if (YValue > 600 && FastChng == 2) {  // Si estamos en modo de cambio rápido y el joystick está hacia abajo:
+        if ((millis() - SetTime) > LongInt) {  // Si ha pasado suficiente tiempo basado en LongInt:
+          rolePerMinute = rolePerMinute - 1;  // Decrementa rolePerMinute en 1.
+          SetTime = millis();  // Actualiza SetTime al tiempo actual.
+          lcd.clear();  // Limpia la pantalla LCD.
+        }
+      }
+      
+      if (rolePerMinute < 1){  // Si la velocidad del motor es menor que 1 RPM, establece el mínimo permitido en 1 RPM.
+        rolePerMinute = 1;
+      }
+      
+      if (rolePerMinute > 17){  // Si la velocidad del motor es mayor que 17 RPM, establece el máximo permitido en 17 RPM.
+        rolePerMinute = 17;
+      }
+    }
+
+    if (SwMenu == 2){  // Si el submenú (SwMenu) es 2, se muestra y ajusta el número de turnos.
+      lcd.setCursor(0, 0);  // Configura el cursor en la posición 0,0 de la pantalla LCD.
+      lcd.print("Nr. de turnos");  // Muestra el texto "Nr. de turnos".
+      lcd.setCursor(7, 1);  // Configura el cursor en la posición 7,1 (segunda línea).
+      lcd.print(TurnNr);  // Muestra el número de turnos (TurnNr).
+
+      if (FastChng == 0) {  // Si no se está en modo de cambio rápido, actualiza el tiempo de referencia.
+        SetTime = millis();  // Establece SetTime al tiempo actual en milisegundos.
+      }
+      
+      if (YValue < 400 && Flag4 == 0){ // Si el joystick se mueve hacia arriba (YValue < 400) y la bandera 4 es 0, aumenta el número de turnos en 1.
+        TurnNr = TurnNr + 1;  // Incrementa TurnNr en 1.
+        Flag4 = 1;  // Establece Flag4 a 1 para evitar cambios repetitivos.
+        FastChng = 1;  // Activa el modo de cambio rápido.
+        lcd.clear();  // Limpia la pantalla LCD.
+      }
+      
+      if (YValue > 600 && Flag4 == 0){ // Si el joystick se mueve hacia abajo (YValue > 600) y la bandera 4 es 0, disminuye el número de turnos en 1.
+        TurnNr = TurnNr - 1;  // Decrementa TurnNr en 1.
+        Flag4 = 1;  // Establece Flag4 a 1 para evitar cambios repetitivos.
+        FastChng = 1;  // Activa el modo de cambio rápido.
+        lcd.clear();  // Limpia la pantalla LCD.
+      }
+      
+      if (YValue > 399 && YValue < 599 && Flag4 == 1){  // Si el joystick está en la posición neutral (YValue entre 400 y 600) y Flag4 es 1, restablece Flag4 y desactiva el modo de cambio rápido.
+        Flag4 = 0;  // Restablece Flag4.
+        FastChng = 0;  // Desactiva el modo de cambio rápido.
+      }
+
+      if (YValue < 400 && FastChng == 1) {  // Si el joystick está hacia arriba y el modo de cambio rápido está activado, y se mantiene por más tiempo que el tiempo de demora rápido, entra en el modo de cambio rápido.
+        if ((millis() - SetTime) > FastDelay) {  // Si ha pasado más tiempo que FastDelay desde SetTime:
+          FastChng = 2;  // Establece FastChng a 2 para indicar el modo de cambio rápido.
+          SetTime = millis();  // Actualiza SetTime al tiempo actual.
+        }
+      }
+
+      if (YValue > 600 && FastChng == 1) {  // Si el joystick está hacia abajo y el modo de cambio rápido está activado, y se mantiene por más tiempo que el tiempo de demora rápido, entra en el modo de cambio rápido.
+        if ((millis() - SetTime) > FastDelay) {  // Si ha pasado más tiempo que FastDelay desde SetTime:
+          FastChng = 2;  // Establece FastChng a 2 para indicar el modo de cambio rápido.
+          SetTime = millis();  // Actualiza SetTime al tiempo actual.
+        }
+      }
+
+      if (YValue < 400 && FastChng == 2) {  // Si estamos en modo de cambio rápido y el joystick está hacia arriba:
+        if ((millis() - SetTime) > (LongInt - (400 - YValue) * (LongInt - ShortInt) / 400)) {  // Tiempo proporcional basado en la deflexión del joystick:
+          TurnNr = TurnNr + 1;  // Incrementa TurnNr en 1.
+          SetTime = millis();  // Actualiza SetTime al tiempo actual.
+          lcd.clear();  // Limpia la pantalla LCD.
+        }
+      }
+
+      if (YValue > 600 && FastChng == 2) {  // Si estamos en modo de cambio rápido y el joystick está hacia abajo:
+        if ((millis() - SetTime) > (LongInt - (YValue - 600) * (LongInt - ShortInt) / 400)) {  // Tiempo proporcional basado en la deflexión del joystick:
+          TurnNr = TurnNr - 1;  // Decrementa TurnNr en 1.
+          SetTime = millis();  // Actualiza SetTime al tiempo actual.
+          lcd.clear();  // Limpia la pantalla LCD.
+        }
+      }
+      
+      if (TurnNr < 1){  // Si el número de turnos es menor que 1, establece el mínimo permitido en 1.
+        TurnNr = 1;
+      }
+      
+      if (TurnNr > 200){  // Si el número de turnos es mayor que 200, establece el máximo permitido en 200.
+        TurnNr = 200;
+      }
+    }
+
+    if (SwMenu == 3){  // Si el submenú (SwMenu) es 3, se inicia el programa.
+      MaxSwMenu = 1;  // Activa el indicador de menú máximo.
+      StepPoll = 32 * rolePerMinute;  // Establece la tasa de muestreo (StepPoll) basada en la velocidad del motor.
+      lcd.setCursor(0, 0);  // Configura el cursor en la posición 0,0 de la pantalla LCD.
+      lcd.print("Prog. iniciado");  // Muestra el texto "Prog. iniciado".
+      lcd.setCursor(0, 1);  // Configura el cursor en la posición 0,1 (segunda línea).
+      lcd.print("Turnos hechos: ");  // Muestra el texto "Turnos hechos: ".
+      lcd.print(CurrentTurn);  // Muestra el número de turnos actuales (CurrentTurn).
+
+      if (CurrentTurn < TurnNr){  // Mientras el número de turnos actuales sea menor que el número de turnos necesarios:
+        myStepper.setSpeed(rolePerMinute);  // Establece la velocidad del motor al valor de rolePerMinute.
+        Cntr = 0;  // Inicializa el contador de pasos.
+        while ((Cntr <= FullRev) && (CinCancelFlag == 0)) {  // Mientras el contador sea menor o igual a FullRev y la bandera de cancelación cinemática sea 0:
+          myStepper.step(StepPoll);  // Realiza un paso del motor basado en la tasa de muestreo StepPoll.
+          Cntr = Cntr + StepPoll;  // Incrementa el contador de pasos.
+          SwValue = digitalRead(SW_pin);  // Lee el valor del botón de cancelación (SW_pin).
+          if (SwValue == 0 && BtnCancelFlag == 0) {  // Si el botón está presionado y la bandera de cancelación de botón es 0:
+            BtnCancelFlag = 1;  // Establece BtnCancelFlag a 1 para iniciar el temporizador de cancelación.
+            SetTime = millis();  // Establece SetTime al tiempo actual en milisegundos.
+          }
+          if (SwValue == 1 && BtnCancelFlag == 1) {  // Si el botón se suelta antes del tiempo de retraso para cancelar, restablece la bandera de cancelación de botón.
+            BtnCancelFlag = 0;  // Restablece BtnCancelFlag a 0.
+          }
+          if (SwValue == 0 && BtnCancelFlag == 1 && ((millis() - SetTime) > BtnDelay)) {  // Si el botón ha sido mantenido presionado por más tiempo que BtnDelay:
+            CinCancelFlag = 1;  // Establece la bandera de cancelación cinemática a 1 para cancelar la operación.
+            CurrentTurn = TurnNr;  // Establece CurrentTurn al número de turnos necesarios.
+          }
+        }
+        if (CinCancelFlag == 0) {  // Si la operación no fue cancelada:
+          myStepper.step(FullRev + StepPoll - Cntr);  // Realiza el resto de los pasos necesarios para completar un giro completo.
+          CurrentTurn = CurrentTurn + 1;  // Incrementa el número de turnos actuales.
+          lcd.setCursor(0, 1);  // Configura el cursor en la posición 0,1 de la pantalla LCD.
+          lcd.print("Turnos hechos: ");  // Muestra el texto "Turnos hechos: ".
+          lcd.print(CurrentTurn);  // Muestra el número de turnos actuales.
+        }
+      }
+
+      if (CurrentTurn == TurnNr){  // Si el número de turnos actuales es igual al número de turnos necesarios:
+        lcd.setCursor(0, 0);  // Configura el cursor en la posición 0,0 de la pantalla LCD.
+        if (CinCancelFlag == 0) {  // Si la operación no fue cancelada:
+          lcd.print("Prog. finalizado");  // Muestra el texto "Prog. finalizado".
+        }
+        else {  // Si la operación fue cancelada:
+          lcd.clear();  // Limpia la pantalla LCD.
+          lcd.print("Prog. cancelado");  // Muestra el texto "Prog. cancelado".
+        }
+        delay(3000);  // Espera 3 segundos.
+        lcd.clear();  // Limpia la pantalla LCD.
+        CurrentTurn = 0;  // Restablece el número de turnos actuales a 0.
+        PhotoNr = 1;  // Restablece el número de fotos a 1.
+        rolePerMinute = 15;  // Restablece la velocidad del motor a 15 RPM.
+        SwMenu = 0;  // Restablece el submenú a 0.
+        MaxSwMenu = 0;  // Restablece MaxSwMenu a 0.
+        CinCancelFlag = 0;  // Restablece la bandera de cancelación cinemática a 0.
+        Steps = 0;  // Restablece el contador de pasos a 0.
+      }
+    }
+}
+
 
