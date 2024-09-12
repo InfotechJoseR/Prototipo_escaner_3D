@@ -115,4 +115,145 @@ void loop() {
     BtnFlag = 0;
   }
 
+  //***********************************************Menu0 - Fotogrametria ***********************************************//
+
+
+  if (MenuNr == 0){  // Si el número del menú es 0, se ejecuta el código del Menú 0.
+
+    if (SwMenu == 0){ // Si el submenú (SwMenu) es 0, se muestra el texto "Fotogrametria" en la pantalla LCD.
+      lcd.setCursor(0, 0);  // Configura el cursor en la posición 0,0 de la pantalla LCD.
+      lcd.print("Fotogrametria");  // Muestra el texto "Fotogrametria".
+    }
   
+    if (SwMenu == 1){ // Si el submenú (SwMenu) es 1, se muestra el número de fotos y permite ajustar la cantidad de fotos.
+      lcd.setCursor(0, 0);  // Configura el cursor en la posición 0,0 de la pantalla LCD.
+      lcd.print("Nr. de fotos ");  // Muestra el texto "Nr. de fotos".
+      lcd.setCursor(7, 1);  // Configura el cursor en la posición 7,1 (segunda línea).
+      lcd.print(PhotoNr);  // Muestra el número de fotos (PhotoNr).
+
+      if (FastChng == 0) {  // Si no se está en modo de cambio rápido, actualiza el tiempo de referencia.
+        SetTime = millis();  // Establece SetTime al tiempo actual en milisegundos.
+      }
+      
+      if (YValue < 400 && Flag2 == 0){ // Si el joystick se mueve hacia arriba (YValue < 400), la bandera 2 es 0 y SwMenu es 1, entonces se añade 2 al número de fotos.
+        PhotoNr = PhotoNr + 2;  // Incrementa PhotoNr en 2.
+        Flag2 = 1;  // Establece Flag2 a 1 para evitar cambios repetitivos.
+        FastChng = 1;  // Activa el modo de cambio rápido.
+        lcd.clear();  // Limpia la pantalla LCD.
+      }
+      
+      if (YValue > 600 && Flag2 == 0){ // Si el joystick se mueve hacia abajo (YValue > 600), la bandera 2 es 0 y SwMenu es 1, entonces se resta 2 del número de fotos.
+        PhotoNr = PhotoNr - 2;  // Decrementa PhotoNr en 2.
+        Flag2 = 1;  // Establece Flag2 a 1 para evitar cambios repetitivos.
+        FastChng = 1;  // Activa el modo de cambio rápido.
+        lcd.clear();  // Limpia la pantalla LCD.
+      }
+      
+      if (YValue > 399 && YValue < 599 && Flag2 == 1){  // Si el joystick está en la posición neutral (YValue entre 400 y 600) y Flag2 es 1, restablece Flag2 y desactiva el modo de cambio rápido.
+        Flag2 = 0;  // Restablece Flag2.
+        FastChng = 0;  // Desactiva el modo de cambio rápido.
+      }
+
+      if (YValue < 400 && FastChng == 1) {  // Si el joystick está hacia arriba y el modo de cambio rápido está activado, y se mantiene por más tiempo que el tiempo de demora rápido, entra en el modo de cambio rápido.
+        if ((millis() - SetTime) > FastDelay) {  // Si ha pasado más tiempo que FastDelay desde SetTime:
+          FastChng = 2;  // Establece FastChng a 2 para indicar el modo de cambio rápido.
+          SetTime = millis();  // Actualiza SetTime al tiempo actual.
+        }
+      }
+
+      if (YValue > 600 && FastChng == 1) {  // Si el joystick está hacia abajo y el modo de cambio rápido está activado, y se mantiene por más tiempo que el tiempo de demora rápido, entra en el modo de cambio rápido.
+        if ((millis() - SetTime) > FastDelay) {  // Si ha pasado más tiempo que FastDelay desde SetTime:
+          FastChng = 2;  // Establece FastChng a 2 para indicar el modo de cambio rápido.
+          SetTime = millis();  // Actualiza SetTime al tiempo actual.
+        }
+      }
+
+      if (YValue < 400 && FastChng == 2) {  // Si estamos en modo de cambio rápido y el joystick está hacia arriba:
+        if ((millis() - SetTime) > (LongInt - (400 - YValue) * (LongInt - ShortInt) / 400)) {  // Si ha pasado suficiente tiempo basado en la deflexión del joystick:
+          PhotoNr = PhotoNr + 2;  // Incrementa PhotoNr en 2.
+          SetTime = millis();  // Actualiza SetTime al tiempo actual.
+          lcd.clear();  // Limpia la pantalla LCD.
+        }
+      }
+
+      if (YValue > 600 && FastChng == 2) {  // Si estamos en modo de cambio rápido y el joystick está hacia abajo:
+        if ((millis() - SetTime) > (LongInt - (YValue - 600) * (LongInt - ShortInt) / 400)) {  // Si ha pasado suficiente tiempo basado en la deflexión del joystick:
+          PhotoNr = PhotoNr - 2;  // Decrementa PhotoNr en 2.
+          SetTime = millis();  // Actualiza SetTime al tiempo actual.
+          lcd.clear();  // Limpia la pantalla LCD.
+        }
+      }
+
+      if (PhotoNr < 2){    // Si el número de fotos es menor que 2, establece el número mínimo de fotos en 2.
+        PhotoNr = 2;
+      }
+      
+      if (PhotoNr > 200){  // Si el número de fotos es mayor que 200, establece el número máximo de fotos en 200.
+        PhotoNr = 200;
+      }
+    }
+
+    if (SwMenu == 2){ // Si el submenú (SwMenu) es 2, se ha iniciado el programa.
+
+      MaxSwMenu = 1;  // Establece MaxSwMenu a 1 para indicar que se está en el menú máximo.
+      
+      lcd.setCursor(0, 0);  // Configura el cursor en la posición 0,0 de la pantalla LCD.
+      lcd.print("Empezamos");  // Muestra el texto "Empezamos".
+      lcd.setCursor(0, 1);  // Configura el cursor en la posición 0,1 (segunda línea).
+      lcd.print("Nr. de fotos");  // Muestra el texto "Nr. de fotos".
+      lcd.print(PhotoTaken);  // Muestra el número de fotos tomadas (PhotoTaken).
+      
+      StepPerPhoto = FullRev / PhotoNr;  // Calcula la cantidad de pasos por foto.
+
+      if (PhotoTaken < PhotoNr){  // Mientras no se haya tomado el número total de fotos:
+        myStepper.setSpeed(rolePerMinute);  // Configura la velocidad del motor paso a paso.
+        myStepper.step(StepPerPhoto);  // Mueve el motor paso a paso la cantidad calculada de pasos.
+        PhotoTaken = PhotoTaken + 1;  // Incrementa el contador de fotos tomadas.
+        lcd.setCursor(0, 1);  // Configura el cursor en la posición 0,1 (segunda línea).
+        lcd.print("Foto Nr.    ");  // Muestra el texto "Foto Nr.".
+        lcd.print(PhotoTaken);  // Muestra el número de fotos tomadas.
+        digitalWrite(19, LOW);  // Enciende el LED conectado al pin 19.
+        delay(300);  // Espera 300 ms.
+        digitalWrite(19, HIGH);  // Apaga el LED conectado al pin 19.
+        delay(4000);  // Espera 4 segundos.
+      }
+
+      if (PhotoTaken == PhotoNr){  // Si el número de fotos tomadas es igual al número de fotos a tomar:
+        lcd.setCursor(0, 0);  // Configura el cursor en la posición 0,0 de la pantalla LCD.
+        lcd.print("Prog. finalizado");  // Muestra el texto "Prog. finalizado".
+        delay(3000);  // Espera 3 segundos.
+        lcd.clear();  // Limpia la pantalla LCD.
+        PhotoTaken = 0;  // Restablece el contador de fotos tomadas.
+        PhotoNr = 2;  // Restablece el número de fotos a 2.
+        SwMenu = 0;  // Restablece el submenú a 0.
+        MaxSwMenu = 0;  // Restablece MaxSwMenu a 0.
+        Steps = 0;  // Restablece el contador de pasos a 0.
+      }
+
+      // Nota: La cancelación funciona, pero el retraso es mayor de lo esperado ya que el movimiento del motor paso a paso bloquea.
+      if (SwValue == 0 && BtnCancelFlag == 0) {  // Si se presiona el botón y la bandera de cancelación es 0, comienza el temporizador para cancelar.
+        BtnCancelFlag = 1;  // Establece BtnCancelFlag a 1 para indicar que se ha comenzado a cancelar.
+        SetTime = millis();  // Establece SetTime al tiempo actual en milisegundos.
+      }
+
+      if (SwValue == 1 && BtnCancelFlag == 1) {  // Si el botón se suelta antes de que pase el tiempo de retraso para cancelar, restablece la bandera de cancelación.
+        BtnCancelFlag = 0;  // Restablece BtnCancelFlag a 0.
+      }
+
+      if (SwValue == 0 && BtnCancelFlag == 1 && ((millis() - SetTime) > BtnDelay)) {  // Si el botón se mantiene presionado por más tiempo que BtnDelay, cancela la operación.
+        lcd.clear();  // Limpia la pantalla LCD.
+        lcd.setCursor(0, 0);  // Configura el cursor en la posición 0,0 de la pantalla LCD.
+        lcd.print("Prog. cancelado");  // Muestra el texto "Prog. cancelado".
+        delay(3000);  // Espera 3 segundos.
+        lcd.clear();  // Limpia la pantalla LCD.
+        PhotoTaken = 0;  // Restablece el contador de fotos tomadas.
+        PhotoNr = 2;  // Restablece el número de fotos a 2.
+        SwMenu = 0;  // Restablece el submenú a 0.
+        MaxSwMenu = 0;  // Restablece MaxSwMenu a 0.
+        Steps = 0;  // Restablece el contador de pasos a 0.
+        BtnCancelFlag = 0;  // Restablece BtnCancelFlag a 0.
+      }
+    }
+}
+
+
