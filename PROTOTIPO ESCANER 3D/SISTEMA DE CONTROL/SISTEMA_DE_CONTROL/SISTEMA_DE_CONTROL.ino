@@ -48,3 +48,30 @@ Stepper myStepper(stepsPerRevolution, 9, 11, 10, 12);  // Inicializa el motor pa
 
 Servo Servo1;  // Define Servo1 como un servo.
 
+void setup() {
+  lcd.begin(16, 2);                   // Configura el LCD con 16 columnas y 2 filas para la conexión estándar (no I2C).
+  pinMode(SW_pin, INPUT);             // Configura el pin del interruptor como entrada.
+  digitalWrite(SW_pin, HIGH);         // Establece el pin del interruptor en HIGH (estado alto).
+
+  pinMode(19, OUTPUT);                // Configura el pin 19 como salida.
+  digitalWrite(19, HIGH);             // Establece el pin 19 en HIGH (estado alto).
+  
+  myStepper.setSpeed(rolePerMinute);  // Configura las RPM del motor paso a paso.
+
+  Servo1.attach(3);                   // Conecta el servo al pin 3.
+  Servo1.write(90);                   // Mueve el servo a la posición media (90 grados).
+
+  lcd.setCursor(0, 0);                // Configura el cursor del LCD en la posición 0,0 (inicio).
+  lcd.print(" ESPE STO. DGO. ");      // Muestra el texto "ESPE STO. DGO." en la primera línea del LCD.
+  lcd.setCursor(1, 1);                // Configura el cursor del LCD en la posición 1,1 (segunda línea).
+  lcd.print("  ESCANNER 3D   ");      // Muestra el texto "ESCANNER 3D" en la segunda línea del LCD.
+  delay(3000);                        // Espera 3 segundos.
+  lcd.clear();                        // Limpia la pantalla del LCD.
+  lcd.setCursor(0, 0);                // Configura el cursor del LCD en la posición 0,0 (inicio).
+  lcd.print("Elaborado por");         // Muestra el texto "Elaborado por" en la primera línea del LCD.
+  lcd.setCursor(0, 1);                // Configura el cursor del LCD en la posición 0,1 (segunda línea).
+  lcd.print("Jose Ruiz");             // Muestra el texto "Jose Ruiz" en la segunda línea del LCD.
+  delay(2000);                        // Espera 2 segundos.
+  lcd.clear();                        // Limpia la pantalla del LCD. Finaliza la pantalla de inicio.
+}
+
