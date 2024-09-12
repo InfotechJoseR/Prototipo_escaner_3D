@@ -1,3 +1,42 @@
+/*
+   Prototipo de escáner 3D
+   
+   Descripción:
+   Este programa controla un prototipo de escáner 3D, gestionando el movimiento de un motor paso a paso,
+   la captura de imágenes con una cámara, y la interacción con el usuario mediante una pantalla LCD y un potenciómetro.
+ 
+   Funciones Principales:
+    - Control del Motor Paso a Paso: Gira la base del escáner a intervalos precisos para capturar imágenes desde diferentes ángulos.
+    - Captura de Imágenes: Envía señales a la cámara para tomar fotografías en diferentes ángulos.
+    - Interacción con el Usuario: Muestra información en la pantalla LCD y permite ajustar el brillo con el potenciómetro.
+
+  Librerías Utilizadas:
+    - LiquidCrystal: Para controlar la pantalla LCD.
+    - Stepper: Para controlar el motor paso a paso.
+    - Wire: Para la comunicación I2C.
+    - Servo: Para el control de servomotores.
+
+   Variables Globales:
+    - MenuNr: Número del menú actual.
+    - SwMenu: Submenú seleccionado dentro del menú actual.
+    - rolePerMinute: Velocidad del motor en revoluciones por minuto (RPM).
+    - TurnNr: Número de turnos que el motor debe realizar.
+    - CurrentTurn: Contador de los turnos actuales completados.
+    - Steps: Número de pasos del motor.
+    - FlagX: Variables de bandera utilizadas para controlar el estado de entrada del joystick.
+    - FastChng: Variable para controlar el modo de cambio rápido.
+    - SetTime: Tiempo de referencia para el modo de cambio rápido.
+    - LongInt, ShortInt: Intervalos de tiempo utilizados en el modo de cambio rápido.
+    - BtnCancelFlag, CinCancelFlag: Banderas para cancelar operaciones.
+    - PhotoNr: Número de fotos (puede estar relacionado con alguna funcionalidad adicional).
+ 
+   Nota:
+    - Asegurarse de que las conexiones del hardware (LCD, joystick, motor paso a paso) estén correctas
+    y que las librerías necesarias estén instaladas en el entorno de desarrollo.
+
+*/
+
+
 // Librerías utilizadas
 #include <LiquidCrystal.h>  // Incluye la librería para el LCD estándar (no I2C)
 #include <Wire.h>  // Incluye la librería para el I2C del LCD. SCL se conecta al pin A5, SDA se conecta al pin A4. Se necesita un jumper en el pin de retroiluminación LED en la placa I2C.
