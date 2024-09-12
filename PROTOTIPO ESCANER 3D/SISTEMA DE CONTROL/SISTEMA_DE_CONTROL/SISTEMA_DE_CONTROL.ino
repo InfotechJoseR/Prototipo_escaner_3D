@@ -34,3 +34,17 @@ bool CinCancelFlag = 0;  // Bandera usada para activar la cancelación cinematog
 int StepPoll = 480;  // Número de pasos del motor para sondear la cancelación cinematográfica (a 15 rpm).
 int Cntr = 0;  // Contador de pasos para la cancelación del motor cinematográfico.
 // Fin de las variables añadidas.
+
+const int stepsPerRevolution = 2000;  // Cambia esto para ajustar el número de pasos por revolución.
+int FullRev = 14336;  // 1 revolución completa del engranaje grande -> La relación entre el engranaje pequeño y el grande es de 7:1.
+int rolePerMinute = 15;  // Rango ajustable del motor paso a paso 28BYJ-48 es de 0~17 rpm.
+int PhotoTaken = 0;  // Cantidad de fotos tomadas.
+int StepPerPhoto;  // Cantidad de pasos por foto (calculado -> ver MenuNr 0/SwMenu 2).
+int TurnNr = 1;  // Cantidad de giros.
+int CurrentTurn = 0;  // Almacena el número de giro actual.
+int Steps = 0;  // Cantidad de pasos individuales que el motor paso a paso tiene que girar.
+
+Stepper myStepper(stepsPerRevolution, 9, 11, 10, 12);  // Inicializa el motor paso a paso usando los pines especificados.
+
+Servo Servo1;  // Define Servo1 como un servo.
+
