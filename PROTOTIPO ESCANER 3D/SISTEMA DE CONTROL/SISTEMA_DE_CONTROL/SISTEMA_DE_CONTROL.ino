@@ -462,4 +462,117 @@ void loop() {
     }
 }
 
+//***********************************************Menu2 - Control Manual***********************************************//
+
+  if (MenuNr == 2){  // Si el número del menú es 2, se ejecuta el código del Menú 2.
+
+    if (SwMenu == 0){  // Si el submenú (SwMenu) es 0:
+        lcd.setCursor(0, 0);  // Configura el cursor en la posición 0,0 de la pantalla LCD.
+        lcd.print("Control manual");  // Muestra el texto "Control manual".
+    }
+
+    if (SwMenu == 1){  // Si el submenú (SwMenu) es 1 (entrada en el menú 2):
+        lcd.setCursor(0, 0);  // Configura el cursor en la posición 0,0 de la pantalla LCD.
+        lcd.print("Velocidad motor");  // Muestra el texto "Velocidad motor".
+        lcd.setCursor(7, 1);  // Configura el cursor en la posición 7,1 (segunda línea).
+        lcd.print(rolePerMinute);  // Muestra la velocidad del motor (rolePerMinute).
+
+        if (FastChng == 0) {  // Si no se está en modo de cambio rápido, actualiza el tiempo de referencia.
+            SetTime = millis();  // Establece SetTime al tiempo actual en milisegundos.
+        }
+
+        if (YValue < 400 && Flag5 == 0){  // Si el joystick se mueve hacia arriba (YValue < 400) y la bandera 5 es 0, aumenta la velocidad en 1 RPM.
+            rolePerMinute = rolePerMinute + 1;  // Incrementa rolePerMinute en 1.
+            Flag5 = 1;  // Establece Flag5 a 1 para evitar cambios repetitivos.
+            FastChng = 1;  // Activa el modo de cambio rápido.
+            lcd.clear();  // Limpia la pantalla LCD.
+        }
+
+        if (YValue > 600 && Flag5 == 0){  // Si el joystick se mueve hacia abajo (YValue > 600) y la bandera 5 es 0, disminuye la velocidad en 1 RPM.
+            rolePerMinute = rolePerMinute - 1;  // Decrementa rolePerMinute en 1.
+            Flag5 = 1;  // Establece Flag5 a 1 para evitar cambios repetitivos.
+            FastChng = 1;  // Activa el modo de cambio rápido.
+            lcd.clear();  // Limpia la pantalla LCD.
+        }
+
+        if (YValue > 399 && YValue < 599 && Flag5 == 1){  // Si el joystick está en la posición neutral (YValue entre 400 y 600) y Flag5 es 1, restablece Flag5 y desactiva el modo de cambio rápido.
+            Flag5 = 0;  // Restablece Flag5.
+            FastChng = 0;  // Desactiva el modo de cambio rápido.
+        }
+
+        if (YValue < 400 && FastChng == 1) {  // Si el joystick está hacia arriba y el modo de cambio rápido está activado, y se mantiene por más tiempo que el tiempo de demora rápido, entra en el modo de cambio rápido.
+            if ((millis() - SetTime) > FastDelay) {  // Si ha pasado más tiempo que FastDelay desde SetTime:
+                FastChng = 2;  // Establece FastChng a 2 para indicar el modo de cambio rápido.
+                SetTime = millis();  // Actualiza SetTime al tiempo actual.
+            }
+        }
+
+        if (YValue > 600 && FastChng == 1) {  // Si el joystick está hacia abajo y el modo de cambio rápido está activado, y se mantiene por más tiempo que el tiempo de demora rápido, entra en el modo de cambio rápido.
+            if ((millis() - SetTime) > FastDelay) {  // Si ha pasado más tiempo que FastDelay desde SetTime:
+                FastChng = 2;  // Establece FastChng a 2 para indicar el modo de cambio rápido.
+                SetTime = millis();  // Actualiza SetTime al tiempo actual.
+            }
+        }
+
+        if (YValue < 400 && FastChng == 2) {  // Si estamos en modo de cambio rápido y el joystick está hacia arriba:
+            if ((millis() - SetTime) > LongInt) {  // Si ha pasado suficiente tiempo basado en LongInt:
+                rolePerMinute = rolePerMinute + 1;  // Incrementa rolePerMinute en 1.
+                SetTime = millis();  // Actualiza SetTime al tiempo actual.
+                lcd.clear();  // Limpia la pantalla LCD.
+            }
+        }
+
+        if (YValue > 600 && FastChng == 2) {  // Si estamos en modo de cambio rápido y el joystick está hacia abajo:
+            if ((millis() - SetTime) > LongInt) {  // Si ha pasado suficiente tiempo basado en LongInt:
+                rolePerMinute = rolePerMinute - 1;  // Decrementa rolePerMinute en 1.
+                SetTime = millis();  // Actualiza SetTime al tiempo actual.
+                lcd.clear();  // Limpia la pantalla LCD.
+            }
+        }
+
+        if (rolePerMinute < 1){  // Si la velocidad del motor es menor que 1 RPM, establece el mínimo permitido en 1 RPM.
+            rolePerMinute = 1;
+        }
+
+        if (rolePerMinute > 17){  // Si la velocidad del motor es mayor que 17 RPM, establece el máximo permitido en 17 RPM.
+            rolePerMinute = 17;
+        }
+
+        if (XValue < 400 ){  // Si el joystick se mueve hacia la derecha (XValue < 400) y la bandera 6 es 0, incrementa el número de pasos y mueve el motor en esa dirección.
+            Steps = Steps + 1;  // Incrementa Steps en 1.
+            myStepper.setSpeed(rolePerMinute);  // Establece la velocidad del motor.
+            myStepper.step(Steps);  // Realiza el movimiento del motor basado en el número de pasos.
+            lcd.setCursor(14, 1);  // Configura el cursor en la posición 14,1 de la pantalla LCD.
+            lcd.print("->");  // Muestra el texto "->" para indicar movimiento hacia la derecha.
+            Flag6 = 1;  // Establece Flag6 a 1 para indicar que se ha realizado un movimiento.
+        }
+
+        if (XValue > 600 ){  // Si el joystick se mueve hacia la izquierda (XValue > 600) y la bandera 6 es 0, decrementa el número de pasos y mueve el motor en esa dirección.
+            Steps = Steps + 1;  // Incrementa Steps en 1.
+            myStepper.setSpeed(rolePerMinute);  // Establece la velocidad del motor.
+            myStepper.step(-Steps);  // Realiza el movimiento del motor basado en el número de pasos negativos.
+            lcd.setCursor(0, 1);  // Configura el cursor en la posición 0,1 de la pantalla LCD.
+            lcd.print("<-");  // Muestra el texto "<-" para indicar movimiento hacia la izquierda.
+            Flag6 = 1;  // Establece Flag6 a 1 para indicar que se ha realizado un movimiento.
+        }
+
+        if (XValue > 399 && XValue < 599){  // Si el joystick está en la posición neutral (XValue entre 400 y 600) y la bandera 6 es 1, restablece Steps y limpia la pantalla LCD.
+            Steps = 0;  // Restablece Steps a 0.
+            if (Flag6 == 1){  // Si Flag6 es 1:
+                lcd.clear();  // Limpia la pantalla LCD.
+                Flag6 = 0;  // Restablece Flag6 a 0.
+            }
+        }
+    }
+
+    if (SwMenu == 2){  // Si el submenú (SwMenu) es 2 (salida del menú 2 al presionar un botón):
+        lcd.clear();  // Limpia la pantalla LCD.
+        CurrentTurn = 0;  // Restablece el número de turnos actuales a 0.
+        PhotoNr = 1;  // Restablece el número de fotos a 1.
+        rolePerMinute = 15;  // Restablece la velocidad del motor a 15 RPM.
+        SwMenu = 0;  // Restablece el submenú a 0.
+        Steps = 0;  // Restablece el número de pasos a 0.
+    }
+  }
+}
 
