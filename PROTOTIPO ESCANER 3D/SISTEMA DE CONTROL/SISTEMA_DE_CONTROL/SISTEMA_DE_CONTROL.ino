@@ -75,3 +75,44 @@ void setup() {
   lcd.clear();                        // Limpia la pantalla del LCD. Finaliza la pantalla de inicio.
 }
 
+void loop() {
+
+  int XValue = analogRead(X_pin);     // Lee el valor analógico del eje X del joystick.
+  int YValue = analogRead(Y_pin);     // Lee el valor analógico del eje Y del joystick.
+  int SwValue = digitalRead(SW_pin);  // Lee el valor digital del botón del joystick.
+
+  if (MenuNr < 0){  // Si el número del menú es menor que 0, establecer el número del menú a 0. Esto define el número mínimo de menús.
+    MenuNr = 0;
+  }
+  else if (MenuNr > 2){  // Si el número del menú es mayor que 2, establecer el número del menú a 2. Esto define el número máximo de menús.
+    MenuNr = 2;
+  }
+
+  if (XValue < 400 && Flag1 == 0 && SwMenu == 0){  // Si el joystick se empuja hacia la derecha, la bandera 1 es 0 y SwMenu es 0, entonces se añade 1 al número del menú (el propósito de la bandera está en los comentarios de las banderas arriba).
+    MenuNr = MenuNr + 1; 
+    Flag1 = 1;
+    lcd.clear();
+  }
+
+  if (XValue > 600 && Flag1 == 0 && SwMenu == 0){  // Si el joystick se empuja hacia la izquierda, la bandera 1 es 0 y SwMenu es 0, entonces se resta 1 del número del menú (el propósito de la bandera está en los comentarios de las banderas arriba).
+    MenuNr = MenuNr - 1;
+    Flag1 = 1;
+    lcd.clear();
+  }
+
+  if (XValue > 399 && XValue < 599 && Flag1 == 1){  // Si el joystick está en posición neutral, se restablece la bandera 1 a 0 (el propósito de la bandera está en los comentarios de las banderas arriba).
+    Flag1 = 0;
+  }
+
+  if (SwValue == 0 && BtnFlag == 0 && MaxSwMenu == 0){  // Si se presiona el botón, la bandera es 0 y MaxSwMenu es 0, entonces se añade 1 a SwMenu.
+    SwMenu = SwMenu + 1;
+    BtnFlag = 1;
+    BtnCancelFlag = 0;
+    lcd.clear();
+  }
+
+  if (SwValue == 1 && BtnFlag == 1){  // Si no se presiona el botón y la bandera es 1, se restablece la bandera (el propósito de la bandera está en los comentarios de las banderas arriba).
+    BtnFlag = 0;
+  }
+
+  
