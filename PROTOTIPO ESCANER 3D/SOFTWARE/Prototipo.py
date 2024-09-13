@@ -372,3 +372,40 @@ def show_message(message):
     message_label.configure(text=message)
     root.update_idletasks()
 
+# Función principal para la ejecución automática
+def auto_run():
+    """
+    Ejecuta automáticamente una serie de funciones para la reconstrucción 3D.
+
+    Esta función carga imágenes, ejecuta COLMAP, carga y muestra el modelo 3D,
+    y genera polígonos en secuencia, cada una en un hilo separado.
+
+    Parámetros:
+    Ninguno
+    """
+    if load_images():
+        run_in_thread(run_colmap)
+        run_in_thread(load_and_show_model)
+        run_in_thread(generate_polygons)
+
+def on_option_select(choice):
+    """
+    Ejecuta una acción basada en la opción seleccionada por el usuario.
+
+    Esta función ejecuta diferentes funciones basadas en la opción seleccionada
+    por el usuario en la interfaz de usuario.
+
+    Parámetros:
+    choice (str): La opción seleccionada por el usuario.
+    """
+    if choice == "Cargar Imágenes":
+        load_images()
+    elif choice == "Ejecutar COLMAP":
+        run_in_thread(run_colmap)
+    elif choice == "Cargar y Mostrar Modelo 3D":
+        run_in_thread(load_and_show_model)
+    elif choice == "Generar Polígonos":
+        run_in_thread(generate_polygons)
+
+options_select = ["Cargar Imágenes", "Ejecutar COLMAP", "Cargar y Mostrar Modelo 3D", "Generar Polígonos"]
+
