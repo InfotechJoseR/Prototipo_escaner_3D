@@ -409,3 +409,76 @@ def on_option_select(choice):
 
 options_select = ["Cargar Imágenes", "Ejecutar COLMAP", "Cargar y Mostrar Modelo 3D", "Generar Polígonos"]
 
+
+# Crear la interfaz gráfica
+root = customtkinter.CTk()
+root.title("Prototipo de Escáner 3D con COLMAP")
+root.geometry("550x350")
+
+# Crear un marco para el título
+frameTitle = customtkinter.CTkFrame(master=root, width=400, height=100)
+frameTitle.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="wesn")
+
+# Título principal alineado a la derecha con margen
+title_label = customtkinter.CTkLabel(frameTitle, text="Prototipo de Escáner 3D", font=("Helvetica", 30, "bold"))
+title_label.grid(row=0, column=0, pady=[10, 0], padx=20)
+
+# Subtítulo alineado a la derecha con margen
+subtitle_label = customtkinter.CTkLabel(frameTitle, justify="right", text="ESPE Sede Santo Domingo", font=("Helvetica", 15, "bold"))
+subtitle_label.grid(row=1, column=0, pady=[0, 40], padx=20)
+
+frameImage = customtkinter.CTkFrame(master=root, width=100, height=100)
+frameImage.grid(row=0, column=1, padx=10, pady=(10, 0), sticky="e")
+
+# Cargar y redimensionar la imagen
+image = Image.open('./Espe-Angular-Logo.png')
+image = image.convert("RGBA")  # Asegurarse de que la imagen tenga un canal alfa
+image = image.resize((90, 100))  # Ajusta el tamaño según sea necesario
+
+# Crear un fondo transparente
+background = Image.new("RGBA", image.size, (0, 0, 0, 0))
+image = Image.alpha_composite(background, image)
+
+# Convertir la imagen a CTkImage
+img = customtkinter.CTkImage(light_image=image, dark_image=image, size=(90, 100))
+
+image_label = customtkinter.CTkLabel(frameImage, image=img, text="")
+image_label.grid(row=0, column=4, sticky="e", padx=10, pady=10)  # Ajusta la posición según sea necesario
+
+# Crear un marco para los botones
+frameButtons = customtkinter.CTkFrame(master=root, width=600, height=30)
+frameButtons.grid(row=1, column=0, padx=10, pady=10, sticky="we", columnspan=2)
+
+load_button = customtkinter.CTkButton(frameButtons, text="Inicio rápido", command=auto_run, fg_color="#e47200", hover_color="#ff8c1a")
+load_button.grid(row=0, column=0, padx=[80,10], pady=10)
+
+or_label = customtkinter.CTkLabel(frameButtons, text="O", font=("Helvetica", 15, "bold"))
+or_label.grid(row=0, column=1, padx=20, pady=10)
+
+# Crear el CTkOptionMenu con una opción predeterminada y asignar la función de comando
+optionmenu = customtkinter.CTkOptionMenu(frameButtons, values=options_select, command=on_option_select)
+optionmenu.set("Acciones")  # Establecer la opción predeterminada
+optionmenu.grid(row=0, column=2, padx=[10,80], pady=10)
+
+# Etiqueta para mostrar mensajes
+message_label = customtkinter.CTkLabel(root, text="")
+message_label.grid(row=2, column=0)
+
+# Barra de progreso
+progress_var = customtkinter.DoubleVar()
+progress_bar = customtkinter.CTkProgressBar(root, variable=progress_var)
+progress_bar.grid(row=3, column=0, columnspan=2, padx=20, pady=10,sticky="we", )
+
+# Crear el marco para el pie de página
+frameFooter = customtkinter.CTkFrame(master=root, width=600, height=30)
+frameFooter.grid(row=5, column=0, padx=10, pady=10, sticky="we", columnspan=2)
+
+# Footer
+footer_label = customtkinter.CTkLabel(frameFooter, text="Copyright © José Ruiz 2024\nESPE", font=("Helvetica", 12, "bold"))
+footer_label.grid(row=0, column=0, padx=20, pady=10, sticky="we")
+
+# Ajustar las columnas del frameFooter para centrar el texto
+frameFooter.grid_columnconfigure(0, weight=1)
+
+# Iniciar el bucle principal de la interfaz
+root.mainloop()
