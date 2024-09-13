@@ -299,3 +299,76 @@ def generate_polygons():
     o3d.io.write_triangle_mesh(MESH_DIR, mesh)
     show_message("Polígonos generados y guardados como mesh.ply")
     show_mesh()
+
+def show_mesh():
+    """
+    Muestra la malla 3D generada.
+
+    Esta función carga la malla 3D desde un archivo y la muestra en una ventana
+    de visualización utilizando la biblioteca Open3D.
+
+    Parámetros:
+    Ninguno
+
+    Excepciones:
+    FileNotFoundError: Si el archivo de la malla 3D no existe, se muestra un mensaje de error.
+    """
+    if not os.path.exists(MESH_DIR):
+        show_message("Error: el archivo de la malla 3D no existe.")
+        return
+    show_message("Mostrando malla 3D")
+    vis = o3d.visualization.Visualizer()
+    vis.create_window()
+    mesh = o3d.io.read_triangle_mesh(MESH_DIR)
+    vis.add_geometry(mesh)
+    vis.run()
+    vis.destroy_window()
+
+def load_and_show_model():
+    """
+    Carga y muestra un modelo 3D seleccionado por el usuario.
+
+    Esta función abre un cuadro de diálogo para que el usuario seleccione un archivo
+    de modelo 3D, lo carga y lo muestra en una ventana de visualización.
+
+    Parámetros:
+    Ninguno
+
+    Excepciones:
+    FileNotFoundError: Si el archivo del modelo 3D no existe, se muestra un mensaje de error.
+    """
+    global MODEL_DIR
+    show_message("Selecciona el archivo del modelo 3D")
+    MODEL_DIR = filedialog.askopenfilename(filetypes=[("3D Model Files", "*.ply")])
+    if not os.path.exists(MODEL_DIR):
+        show_message("Error: el archivo del modelo 3D no existe.")
+        return
+    show_message("Mostrando modelo 3D")
+    show_model()
+
+def run_in_thread(func):
+    """
+    Ejecuta una función en un hilo separado y espera a que termine.
+
+    Esta función crea un nuevo hilo para ejecutar la función proporcionada y
+    espera a que el hilo termine antes de continuar.
+
+    Parámetros:
+    func (callable): La función que se ejecutará en un hilo separado.
+    """
+    thread = threading.Thread(target=func)
+    thread.start()
+
+def show_message(message):
+    """
+    Muestra un mensaje en la interfaz de usuario.
+
+    Esta función actualiza el texto de un label en la interfaz de usuario con el
+    mensaje proporcionado.
+
+    Parámetros:
+    message (str): El mensaje que se mostrará en la interfaz de usuario.
+    """
+    message_label.configure(text=message)
+    root.update_idletasks()
+
