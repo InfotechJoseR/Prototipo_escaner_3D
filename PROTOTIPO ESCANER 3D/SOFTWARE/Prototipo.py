@@ -33,8 +33,8 @@ def ensure_directory_exists(directory):
 ensure_directory_exists(SPARSE_DIR)
 ensure_directory_exists(DENSE_DIR)
 
-# Funciones para ejecutar COLMAP desde Python
 
+# Funciones para ejecutar COLMAP desde Python
 def run_colmap_feature_extraction():
     """
     Ejecuta el extractor de características de COLMAP.
