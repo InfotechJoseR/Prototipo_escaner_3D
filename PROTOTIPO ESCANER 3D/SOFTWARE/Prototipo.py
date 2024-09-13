@@ -32,3 +32,184 @@ def ensure_directory_exists(directory):
 # Asegurarse de que los directorios de salida existen
 ensure_directory_exists(SPARSE_DIR)
 ensure_directory_exists(DENSE_DIR)
+
+# Funciones para ejecutar COLMAP desde Python
+
+def run_colmap_feature_extraction():
+    """
+    Ejecuta el extractor de características de COLMAP.
+
+    Esta función ejecuta el comando `feature_extractor` de COLMAP utilizando
+    los parámetros especificados para la base de datos y la ruta de las imágenes.
+
+    Parámetros:
+    Ninguno
+
+    Excepciones:
+    subprocess.CalledProcessError: Si el comando `feature_extractor` falla, se captura
+    la excepción y se muestra un mensaje de error.
+    """
+    try:
+        subprocess.run([
+            COLMAP_PATH, 'feature_extractor',
+            '--database_path', DATABASE_PATH,
+            '--image_path', IMAGE_DIR
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        show_message(f"Error en feature_extractor: {e}")
+
+def run_colmap_exhaustive_matcher():
+    """
+    Ejecuta el emparejador exhaustivo de COLMAP.
+
+    Esta función ejecuta el comando `exhaustive_matcher` de COLMAP utilizando
+    los parámetros especificados para la base de datos.
+
+    Parámetros:
+    Ninguno
+
+    Excepciones:
+    subprocess.CalledProcessError: Si el comando `exhaustive_matcher` falla, se captura
+    la excepción y se muestra un mensaje de error.
+    """
+    try:
+        subprocess.run([
+            COLMAP_PATH, 'exhaustive_matcher',
+            '--database_path', DATABASE_PATH
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        show_message(f"Error en exhaustive_matcher: {e}")
+
+def run_colmap_mapper():
+    """
+    Ejecuta el mapeador de COLMAP.
+
+    Esta función ejecuta el comando `mapper` de COLMAP utilizando
+    los parámetros especificados para la base de datos, la ruta de las imágenes
+    y la ruta de salida.
+
+    Parámetros:
+    Ninguno
+
+    Excepciones:
+    subprocess.CalledProcessError: Si el comando `mapper` falla, se captura
+    la excepción y se muestra un mensaje de error.
+    """
+    try:
+        subprocess.run([
+            COLMAP_PATH, 'mapper',
+            '--database_path', DATABASE_PATH,
+            '--image_path', IMAGE_DIR,
+            '--output_path', SPARSE_DIR
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        show_message(f"Error en mapper: {e}")
+
+def run_colmap_image_undistorter():
+    """
+    Ejecuta el desdistorsionador de imágenes de COLMAP.
+
+    Esta función ejecuta el comando `image_undistorter` de COLMAP utilizando
+    los parámetros especificados para la ruta de las imágenes, la ruta de entrada
+    y la ruta de salida.
+
+    Parámetros:
+    Ninguno
+
+    Excepciones:
+    subprocess.CalledProcessError: Si el comando `image_undistorter` falla, se captura
+    la excepción y se muestra un mensaje de error.
+    """
+    try:
+        subprocess.run([
+            COLMAP_PATH, 'image_undistorter',
+            '--image_path', IMAGE_DIR,
+            '--input_path', os.path.join(SPARSE_DIR, '0'),
+            '--output_path', DENSE_DIR,
+            '--output_type', 'COLMAP'
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        show_message(f"Error en image_undistorter: {e}")
+
+def run_colmap_patch_match_stereo():
+    """
+    Ejecuta el algoritmo PatchMatch Stereo de COLMAP.
+
+    Esta función ejecuta el comando `patch_match_stereo` de COLMAP utilizando
+    los parámetros especificados para la ruta del espacio de trabajo y el formato
+    del espacio de trabajo.
+
+    Parámetros:
+    Ninguno
+
+    Excepciones:
+    subprocess.CalledProcessError: Si el comando `patch_match_stereo` falla, se captura
+    la excepción y se muestra un mensaje de error.
+    """
+    try:
+        subprocess.run([
+            COLMAP_PATH, 'patch_match_stereo',
+            '--workspace_path', DENSE_DIR,
+            '--workspace_format', 'COLMAP',
+            '--PatchMatchStereo.geom_consistency', 'true'
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        show_message(f"Error en patch_match_stereo: {e}")
+
+def run_colmap_stereo_fusion():
+    """
+    Ejecuta el algoritmo Stereo Fusion de COLMAP.
+
+    Esta función ejecuta el comando `stereo_fusion` de COLMAP utilizando
+    los parámetros especificados para la ruta del espacio de trabajo, el formato
+    del espacio de trabajo, el tipo de entrada y la ruta de salida.
+
+    Parámetros:
+    Ninguno
+
+    Excepciones:
+    subprocess.CalledProcessError: Si el comando `stereo_fusion` falla, se captura
+    la excepción y se muestra un mensaje de error.
+    """
+    try:
+        subprocess.run([
+            COLMAP_PATH, 'stereo_fusion',
+            '--workspace_path', DENSE_DIR,
+            '--workspace_format', 'COLMAP',
+            '--input_type', 'geometric',
+            '--output_path', MODEL_DIR
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        show_message(f"Error en stereo_fusion: {e}")
+
+# Integración con Tkinter
+def load_images():
+    """
+    Carga las imágenes desde una carpeta seleccionada por el usuario.
+
+    Esta función abre un cuadro de diálogo para que el usuario seleccione una carpeta
+    que contenga las imágenes. Verifica que la carpeta exista, que no esté vacía y que
+    todos los archivos en la carpeta sean imágenes válidas.
+
+    Parámetros:
+    Ninguno
+
+    Retorna:
+    bool: True si las imágenes se cargaron exitosamente, False en caso contrario.
+    """
+    global IMAGE_DIR
+    show_message("Selecciona la carpeta de imágenes")
+    IMAGE_DIR = filedialog.askdirectory()
+    if not os.path.exists(IMAGE_DIR):
+        show_message("Error: la carpeta de imágenes no existe.")
+        return False
+    if not os.listdir(IMAGE_DIR):
+        show_message("Error: la carpeta de imágenes está vacía.")
+        return False
+    for f in os.listdir(IMAGE_DIR):
+        if not imghdr.what(os.path.join(IMAGE_DIR, f)):
+            show_message("La carpeta solo debe contener solo imágenes.")
+            return False
+    show_message("Imágenes cargadas exitosamente.")
+    return True
+
