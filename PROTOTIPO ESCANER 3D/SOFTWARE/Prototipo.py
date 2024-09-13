@@ -213,3 +213,89 @@ def load_images():
     show_message("Imágenes cargadas exitosamente.")
     return True
 
+def run_colmap():
+    """
+    Ejecuta la secuencia completa de COLMAP para la reconstrucción 3D.
+
+    Esta función ejecuta una serie de comandos de COLMAP en secuencia para realizar
+    la extracción de características, coincidencias exhaustivas, mapeo, undistorsión
+    de imágenes, cálculo de stereo denso y fusión de resultados.
+
+    Parámetros:
+    Ninguno
+
+    Excepciones:
+    subprocess.CalledProcessError: Si algún comando de COLMAP falla, se captura
+    la excepción y se muestra un mensaje de error.
+    """
+    if not os.path.exists(IMAGE_DIR):
+        show_message("Error: la carpeta de imágenes no existe.")
+        return
+    progress_var.set(0)
+    show_message("Extrayendo características...")
+    run_colmap_feature_extraction()
+    progress_var.set(16.6)
+    show_message("Realizando coincidencias exhaustivas...")
+    run_colmap_exhaustive_matcher()
+    progress_var.set(33.2)
+    show_message("Construyendo mapa...")
+    run_colmap_mapper()
+    progress_var.set(49.8)
+    show_message("Undistorsionando imágenes...")
+    run_colmap_image_undistorter()
+    progress_var.set(66.4)
+    show_message("Calculando stereo denso...")
+    run_colmap_patch_match_stereo()
+    progress_var.set(83.0)
+    show_message("Fusionando resultados...")
+    run_colmap_stereo_fusion()
+    progress_var.set(100)
+    show_message("Reconstrucción completada.")
+    show_model()
+
+def show_model():
+    """
+    Muestra el modelo 3D utilizando Open3D.
+
+    Esta función carga el modelo 3D desde la ruta especificada y lo muestra en una
+    ventana de visualización utilizando la biblioteca Open3D.
+
+    Parámetros:
+    Ninguno
+
+    Excepciones:
+    FileNotFoundError: Si el archivo del modelo 3D no existe, se muestra un mensaje de error.
+    """
+    if not os.path.exists(MODEL_DIR):
+        show_message("Error: el archivo del modelo 3D no existe.")
+        return
+    show_message("Mostrando modelo 3D")
+    vis = o3d.visualization.Visualizer()
+    vis.create_window()
+    model = o3d.io.read_point_cloud(MODEL_DIR)
+    vis.add_geometry(model)
+    vis.run()
+    vis.destroy_window()
+
+def generate_polygons():
+    """
+    Genera una malla de polígonos a partir de un modelo 3D.
+
+    Esta función lee un archivo de nube de puntos 3D, genera una malla de polígonos
+    utilizando el algoritmo Poisson y guarda la malla en un archivo.
+
+    Parámetros:
+    Ninguno
+
+    Excepciones:
+    FileNotFoundError: Si el archivo del modelo 3D no existe, se muestra un mensaje de error.
+    """
+    if not os.path.exists(MODEL_DIR):
+        show_message("Error: el archivo del modelo 3D no existe.")
+        return
+    show_message("Generando polígonos...")
+    pcd = o3d.io.read_point_cloud(MODEL_DIR)
+    mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(pcd, depth=9)
+    o3d.io.write_triangle_mesh(MESH_DIR, mesh)
+    show_message("Polígonos generados y guardados como mesh.ply")
+    show_mesh()
