@@ -1,6 +1,7 @@
 /*
    Prototipo de escáner 3D
-   
+   Desarrollado por Jose Ruiz
+
    Descripción:
    Este programa controla un prototipo de escáner 3D, gestionando el movimiento de un motor paso a paso,
    la captura de imágenes con una cámara, y la interacción con el usuario mediante una pantalla LCD y un potenciómetro.
