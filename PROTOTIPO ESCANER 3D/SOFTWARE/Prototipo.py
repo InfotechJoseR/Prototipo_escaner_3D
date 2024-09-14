@@ -1,6 +1,6 @@
 
 #  Software Prototipo de Escáner 3D
-#  Autor: José Ruiz
+#  Desarrollado por José Ruiz
 
 #Librerías
 import os
@@ -474,7 +474,7 @@ frameFooter = customtkinter.CTkFrame(master=root, width=600, height=30)
 frameFooter.grid(row=5, column=0, padx=10, pady=10, sticky="we", columnspan=2)
 
 # Footer
-footer_label = customtkinter.CTkLabel(frameFooter, text="Copyright © José Ruiz 2024\nESPE", font=("Helvetica", 12, "bold"))
+footer_label = customtkinter.CTkLabel(frameFooter, text="Copyright © ESPE 2024\n\nDesarrollado por José Ruiz"", font=("Helvetica", 12, "bold"))
 footer_label.grid(row=0, column=0, padx=20, pady=10, sticky="we")
 
 # Ajustar las columnas del frameFooter para centrar el texto
