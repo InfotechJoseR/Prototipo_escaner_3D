@@ -13,7 +13,7 @@ from PIL import Image
 import customtkinter
 
 # Ruta completa del ejecutable de COLMAP
-COLMAP_PATH = "C:/Users/José Ruiz/Documents/ESPE/TRABAJO UIC 202450/DESARROLLO DEL PROTOTIPO DE ESCANER 3D/5. SOFTWARE DEL PROTOTIPO/SOFTWARE PROTOTIPO DE ESCANER 3D/Protipo_escaner_3D/colmap-x64-windows-nocuda/bin/colmap.exe"
+COLMAP_PATH = "C:/Users/José Ruiz/Documents/DESARROLLO DEL PROTOTIPO DE ESCANER 3D/Protipo_escaner_3D/colmap-x64-windows-cuda/bin/colmap.exe"
 
 # Directorios de trabajo
 BASE_DIR = os.getcwd()
